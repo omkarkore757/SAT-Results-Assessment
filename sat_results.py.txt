@@ -1,0 +1,115 @@
+import json
+
+class SATResult:
+    def __init__(self, name, address, city, country, pincode, sat_score):
+        self.name = name
+        self.address = address
+        self.city = city
+        self.country = country
+        self.pincode = pincode
+        self.sat_score = sat_score
+        self.passed = "Pass" if self.sat_score > 30 else "Fail"
+
+class SATManager:
+    def __init__(self):
+        self.records = []
+
+    def insert_data(self):
+        name = input("Enter Name: ")
+        address = input("Enter Address: ")
+        city = input("Enter City: ")
+        country = input("Enter Country: ")
+        pincode = input("Enter Pincode: ")
+        sat_score = int(input("Enter SAT Score: "))
+        new_record = SATResult(name, address, city, country, pincode, sat_score)
+        self.records.append(new_record)
+        print(f"Data for {name} inserted successfully!")
+
+    def view_all_data(self):
+        data_list = [record.__dict__ for record in self.records]
+        print(json.dumps(data_list, indent=4))
+
+    def get_rank(self):
+        name = input("Enter the name to get rank: ")
+        sorted_records = sorted(self.records, key=lambda x: x.sat_score, reverse=True)
+        for i, record in enumerate(sorted_records, 1):
+            if record.name == name:
+                print(f"{name} is ranked {i}")
+                return
+        print(f"No record found for {name}")
+
+    def update_score(self):
+        name = input("Enter the name to update score: ")
+        for record in self.records:
+            if record.name == name:
+                new_score = int(input("Enter new SAT score: "))
+                record.sat_score = new_score
+                record.passed = "Pass" if new_score > 30 else "Fail"
+                print(f"Score updated for {name}")
+                return
+        print(f"No record found for {name}")
+
+    def delete_record(self):
+        name = input("Enter the name to delete: ")
+        for record in self.records:
+            if record.name == name:
+                self.records.remove(record)
+                print(f"Record for {name} deleted successfully!")
+                return
+        print(f"No record found for {name}")
+
+    def calculate_average_score(self):
+        if not self.records:
+            print("No records available to calculate the average.")
+            return
+        average_score = sum([r.sat_score for r in self.records]) / len(self.records)
+        print(f"Average SAT score of all candidates is {average_score:.2f}")
+
+    def filter_by_pass_fail(self):
+        status = input("Enter status (Pass/Fail): ")
+        filtered_records = [r.__dict__ for r in self.records if r.passed.lower() == status.lower()]
+        print(json.dumps(filtered_records, indent=4))
+
+    def save_to_json(self):
+        data_list = [record.__dict__ for record in self.records]
+        with open('sat_results.json', 'w') as file:
+            json.dump(data_list, file, indent=4)
+        print("Data saved to sat_results.json")
+
+    def menu(self):
+        while True:
+            print("\n1. Insert Data")
+            print("2. View All Data")
+            print("3. Get Rank")
+            print("4. Update Score")
+            print("5. Delete One Record")
+            print("6. Calculate Average SAT Score")
+            print("7. Filter Records by Pass/Fail Status")
+            print("8. Save Data to JSON File")
+            print("9. Exit")
+            choice = int(input("Enter your choice: "))
+
+            if choice == 1:
+                self.insert_data()
+            elif choice == 2:
+                self.view_all_data()
+            elif choice == 3:
+                self.get_rank()
+            elif choice == 4:
+                self.update_score()
+            elif choice == 5:
+                self.delete_record()
+            elif choice == 6:
+                self.calculate_average_score()
+            elif choice == 7:
+                self.filter_by_pass_fail()
+            elif choice == 8:
+                self.save_to_json()
+            elif choice == 9:
+                break
+            else:
+                print("Invalid choice, please try again.")
+
+if __name__ == "__main__":
+    manager = SATManager()
+    manager.menu()
